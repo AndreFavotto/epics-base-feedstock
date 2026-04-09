@@ -70,6 +70,14 @@ outputs:
         - epics/templates
     tests:
       - script:
+          - if: not win
+            then:
+              - set -x
+              - echo "EPICS_BASE=${EPICS_BASE}"
+              - echo "EPICS_HOST_ARCH=${EPICS_HOST_ARCH}"
+              - echo "SHLIB_EXT=${SHLIB_EXT}"
+              - ls ${EPICS_BASE}/lib/ || true
+              - ls ${EPICS_BASE}/bin/ || true
           - caget -h
           - cainfo -h
           - caput -h
