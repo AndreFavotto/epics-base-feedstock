@@ -33,6 +33,9 @@ AR = ${AR} -rc
 RANLIB = ${RANLIB}
 COMMANDLINE_LIBRARY=EPICS
 EOF
+    # Perl 5.32 references xlocale.h which was removed in glibc 2.26+
+    # Remove when https://github.com/conda-forge/perl-feedstock/issues/28 is solved
+    echo '#include <locale.h>' > "$BUILD_PREFIX/include/xlocale.h"
   else
     echo "CROSS_COMPILER_TARGET_ARCHS=darwin-aarch64" >> configure/CONFIG_SITE
 
