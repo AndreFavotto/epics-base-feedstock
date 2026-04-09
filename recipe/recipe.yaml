@@ -36,7 +36,8 @@ outputs:
         - if: win
           then: m2-patch
       host:
-        - if: unix
+        # avoid linking aarch64 to x86_64 build tools; aarch64 uses COMMANDLINE_LIBRARY=EPICS.
+        - if: unix and not aarch64
           then: readline
       run:
         - perl
@@ -111,7 +112,7 @@ outputs:
         - if: win
           then: m2-patch
       host:
-        - if: unix
+        - if: unix and not aarch64
           then: readline
       run:
         - if: not win
