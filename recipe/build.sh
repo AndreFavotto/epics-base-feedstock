@@ -13,13 +13,34 @@ EOF
 
 if [[ "$host_alias" != "$build_alias" ]]
 then
-  echo "CROSS_COMPILER_TARGET_ARCHS=darwin-aarch64" >> configure/CONFIG_SITE
+  if [[ "$target_platform" == "linux-aarch64" ]]
+  then
+    echo "CROSS_COMPILER_TARGET_ARCHS=linux-aarch64" >> configure/CONFIG_SITE
 
-  # To cross-compile for Apple M1, we first have to compile for x86
-  # The readline found is the host one (arm64)
-  # We don't need it here as x86 is only used for compilation
-  # -> we force COMMANDLINE_LIBRARY to EPICS (instead of readline)
-  cat << EOF >> configure/os/CONFIG_SITE.Common.darwin-x86
+    # Host tools must use the native build-host compiler.
+    cat << EOF >> configure/os/CONFIG_SITE.linux-x86_64.linux-x86_64
+CC = ${CC_FOR_BUILD}
+CCC = ${CXX_FOR_BUILD}
+AR = ${build_alias}-ar -rc
+RANLIB = ${build_alias}-ranlib
+EOF
+
+    # readline is not available for the target; use EPICS built-in CLI instead.
+    cat << EOF >> configure/os/CONFIG_SITE.linux-x86_64.linux-aarch64
+CC = ${CC}
+CCC = ${CXX}
+AR = ${AR} -rc
+RANLIB = ${RANLIB}
+COMMANDLINE_LIBRARY=EPICS
+EOF
+  else
+    echo "CROSS_COMPILER_TARGET_ARCHS=darwin-aarch64" >> configure/CONFIG_SITE
+
+    # To cross-compile for Apple M1, we first have to compile for x86
+    # The readline found is the host one (arm64)
+    # We don't need it here as x86 is only used for compilation
+    # -> we force COMMANDLINE_LIBRARY to EPICS (instead of readline)
+    cat << EOF >> configure/os/CONFIG_SITE.Common.darwin-x86
 CC = ${CC_FOR_BUILD}
 CCC = ${CXX_FOR_BUILD}
 AR = ${build_alias}-ar -rc
@@ -28,6 +49,7 @@ COMMANDLINE_LIBRARY=EPICS
 OP_SYS_LDFLAGS = -Wl,-rpath,\${BUILD_PREFIX}/lib -L\${BUILD_PREFIX}/lib
 OP_SYS_INCLUDES = -I\${BUILD_PREFIX}/include
 EOF
+  fi
 fi
 
 cat << EOF >> configure/os/CONFIG_SITE.Common.linuxCommon
