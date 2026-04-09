@@ -19,6 +19,7 @@ source:
     - initialise_pthreadInfo_attr.patch
     - test_dbtemplate_fix_relative_path_tests.patch
     - increase_default_errlog_size.patch
+    - pva2pva_p2p_build_for_all_archs.patch
 
 build:
   number: 11
