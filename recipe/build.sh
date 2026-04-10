@@ -48,10 +48,9 @@ CCC = ${CXX}
 AR = ${AR} -rc
 RANLIB = ${RANLIB}
 COMMANDLINE_LIBRARY=EPICS
-# Override the default STATIC_BUILD=YES / SHARED_LIBRARIES=NO set in the
-# shipped CONFIG_SITE.linux-x86_64.linux-aarch64
 STATIC_BUILD=NO
 SHARED_LIBRARIES=YES
+VALID_BUILDS=Host Ioc Command
 EOF
     # Perl 5.32 references xlocale.h which was removed in glibc 2.26+
     # Remove when https://github.com/conda-forge/perl-feedstock/issues/28 is solved
