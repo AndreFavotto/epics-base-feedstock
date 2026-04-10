@@ -13,6 +13,8 @@ EOF
 
 if [[ "$host_alias" != "$build_alias" ]]
 then
+  if [[ "$target_platform" != "linux-aarch64" ]]
+  then
   echo "CROSS_COMPILER_TARGET_ARCHS=darwin-aarch64" >> configure/CONFIG_SITE
 
   # To cross-compile for Apple M1, we first have to compile for x86
@@ -28,6 +30,30 @@ COMMANDLINE_LIBRARY=EPICS
 OP_SYS_LDFLAGS = -Wl,-rpath,\${BUILD_PREFIX}/lib -L\${BUILD_PREFIX}/lib
 OP_SYS_INCLUDES = -I\${BUILD_PREFIX}/include
 EOF
+else 
+  echo "CROSS_COMPILER_TARGET_ARCHS=linux-aarch64" >> configure/CONFIG_SITE
+
+    # Host tools must use the native build-host compiler.
+    cat << EOF >> configure/os/CONFIG_SITE.linux-x86_64.linux-x86_64
+CC = ${CC_FOR_BUILD}
+CCC = ${CXX_FOR_BUILD}
+AR = ${build_alias}-ar -rc
+RANLIB = ${build_alias}-ranlib
+EOF
+
+     # same as darwin CC: use COMMANDLINE_LIBRARY=EPICS instead of host readline.
+    cat << EOF >> configure/os/CONFIG_SITE.linux-x86_64.linux-aarch64
+CC = ${CC}
+CCC = ${CXX}
+AR = ${AR} -rc
+RANLIB = ${RANLIB}
+COMMANDLINE_LIBRARY=EPICS
+# Override the default STATIC_BUILD=YES / SHARED_LIBRARIES=NO set in the
+# shipped CONFIG_SITE.linux-x86_64.linux-aarch64
+STATIC_BUILD=NO
+SHARED_LIBRARIES=YES
+EOF
+  fi
 fi
 
 cat << EOF >> configure/os/CONFIG_SITE.Common.linuxCommon
