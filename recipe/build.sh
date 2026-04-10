@@ -53,6 +53,9 @@ COMMANDLINE_LIBRARY=EPICS
 STATIC_BUILD=NO
 SHARED_LIBRARIES=YES
 EOF
+    # Perl 5.32 references xlocale.h which was removed in glibc 2.26+
+    # Remove when https://github.com/conda-forge/perl-feedstock/issues/28 is solved
+    echo '#include <locale.h>' > "$BUILD_PREFIX/include/xlocale.h"
   fi
 fi
 
